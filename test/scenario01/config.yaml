@@ -1,0 +1,22 @@
+# config file for test case scenario #01
+
+name: config.yaml
+description: "Test case - scenario #01: fixed position input format"
+author: aldebap
+date: Jan-11-2023
+
+trace: true
+
+input:
+  - description: "fixed_position.txt"
+    header: false
+    trailer: false
+    fields:
+      - name: sequence
+        type: integer
+        start: 1
+        end: 3
+      - name: description
+        type: string
+        start: 4
+        end: 23
