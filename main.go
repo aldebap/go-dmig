@@ -7,9 +7,12 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
+
+	migration "github.com/aldebap/go-dmig/migration"
 )
 
 const (
@@ -39,4 +42,21 @@ func main() {
 		fmt.Fprintf(os.Stderr, "[error] missing Go-DMig configuration file name\n")
 		os.Exit(-1)
 	}
+
+	//	open Go-DMig config file and load it
+	dmigFile, err := os.Open(dmigFileName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[error] opening Go-DMig file: "+err.Error()+"\n")
+		os.Exit(-1)
+	}
+	defer dmigFile.Close()
+
+	//	load the config file
+	dmig, err := migration.LoadConfigFile(bufio.NewReader(dmigFile))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[error] fail loading Go-DMig file: "+err.Error()+"\n")
+		os.Exit(-1)
+	}
+
+	fmt.Fprintf(os.Stdout, ">>> Migration config: "+dmig.Description+"\n")
 }
