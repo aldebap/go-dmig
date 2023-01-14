@@ -46,7 +46,7 @@ func main() {
 	//	open Go-DMig config file and load it
 	dmigFile, err := os.Open(dmigFileName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[error] opening Go-DMig file: "+err.Error()+"\n")
+		fmt.Fprintf(os.Stderr, "[error] opening Go-DMig file: %s\n", err.Error())
 		os.Exit(-1)
 	}
 	defer dmigFile.Close()
@@ -54,9 +54,14 @@ func main() {
 	//	load the config file
 	dmig, err := migration.LoadConfigFile(bufio.NewReader(dmigFile))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[error] fail loading Go-DMig file: "+err.Error()+"\n")
+		fmt.Fprintf(os.Stderr, "[error] fail loading Go-DMig file: %s\n", err.Error())
 		os.Exit(-1)
 	}
 
-	fmt.Fprintf(os.Stdout, ">>> Migration config: "+dmig.Description+"\n")
+	//	execute the migration
+	err = dmig.PerformMigration()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[error] fail performing data migration: %s\n", err.Error())
+		os.Exit(-1)
+	}
 }

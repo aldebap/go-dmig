@@ -5,20 +5,23 @@ author: aldebap
 date: Jan-11-2023
 
 jobs:
-  - description: "Extract a fixed position file and dump it to stdout"
+  - name: DumpFixedPositionFile
+    description: "Extract data from a fixed position file and dump it to stdout"
 
     input:
-      - description: "fixed_position.txt"
-        header: false
-        trailer: false
-        fields:
-          - name: sequence
-            type: integer
-            start: 1
-            end: 3
-          - name: description
-            type: string
-            start: 4
-            end: 23
+      description: "Fixed Position File"
+      type: FixedPositionFile
+      file_name: "input_01.txt"
+      header: false
+      trailer: false
+      fields:
+        - name: sequence
+          type: integer
+          start: 1
+          end: 3
+        - name: description
+          type: string
+          start: 4
+          end: 23
 
     trace: true
