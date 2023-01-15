@@ -8,6 +8,7 @@ package migration
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 
@@ -88,7 +89,27 @@ func (dmig *DataMigration) PerformMigration() error {
 
 	for _, job := range dmig.JobList {
 
-		fmt.Fprintf(os.Stdout, "Migration Job: %s\n", job.Name)
+		fmt.Fprintf(os.Stdout, "\nMigration Job: %s\n", job.Name)
+
+		//check job's input type
+		inputType, found := io_type[job.Input.Type]
+		if !found {
+			return errors.New("Invalid job's input type: " + job.Input.Type)
+		}
+
+		var input DataInputSource
+
+		switch inputType {
+		case FIXED_POSITION_FILE:
+			input = NewFixedPositionInputFile(job.Input)
+		}
+
+		rowsProcessed, err := input.ImportData()
+		if err != nil {
+			return err
+		}
+
+		fmt.Fprintf(os.Stdout, "Job finished: %d rows processed\n", rowsProcessed)
 	}
 
 	return nil
