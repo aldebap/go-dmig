@@ -7,5 +7,6 @@
 package migration
 
 type DataInputSource interface {
+	ValidateFormat() error
 	ImportData() (rowsProcessed int64, err error)
 }

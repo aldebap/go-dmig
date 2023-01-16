@@ -8,26 +8,16 @@ package migration
 
 import (
 	"bufio"
-	"errors"
-	"fmt"
-	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
-//	constants for input/output types
-const (
-	FIXED_POSITION_FILE = 1
-)
-
-var (
-	io_type = map[string]uint8{
-		"FixedPositionFile": FIXED_POSITION_FILE,
-	}
-)
-
 //	attributes for a data field
 type DataField struct {
+	Name          string `yaml:"name"`
+	Type          string `yaml:"type"`
+	StartPosition int16  `yaml:"start"`
+	EndPosition   int16  `yaml:"end"`
 }
 
 //	attributes for a migration job
@@ -37,7 +27,7 @@ type JobInput struct {
 	FileName    string      `yaml:"file_name"`
 	Header      bool        `yaml:"header"`
 	Trailer     bool        `yaml:"trailer"`
-	Fields      []DataField `yaml:"fields"`
+	FieldList   []DataField `yaml:"fields"`
 }
 
 //	attributes for a migration job
@@ -80,37 +70,4 @@ func LoadConfigFile(reader *bufio.Reader) (*DataMigration, error) {
 	}
 
 	return dataMig, nil
-}
-
-//	PerformMigration perform a migration configured by the DataMigration object
-func (dmig *DataMigration) PerformMigration() error {
-
-	fmt.Fprintf(os.Stdout, ">>> Starting Migration: %s\n", dmig.Description)
-
-	for _, job := range dmig.JobList {
-
-		fmt.Fprintf(os.Stdout, "\nMigration Job: %s\n", job.Name)
-
-		//check job's input type
-		inputType, found := io_type[job.Input.Type]
-		if !found {
-			return errors.New("Invalid job's input type: " + job.Input.Type)
-		}
-
-		var input DataInputSource
-
-		switch inputType {
-		case FIXED_POSITION_FILE:
-			input = NewFixedPositionInputFile(job.Input)
-		}
-
-		rowsProcessed, err := input.ImportData()
-		if err != nil {
-			return err
-		}
-
-		fmt.Fprintf(os.Stdout, "Job finished: %d rows processed\n", rowsProcessed)
-	}
-
-	return nil
 }

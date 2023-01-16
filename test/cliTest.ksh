@@ -15,3 +15,4 @@ echo "[scenario #${SCENARIO}] ${DESCRIPTION}"
 
 cd "scenario${SCENARIO}"
 ../../bin/go-dmig config.yaml
+cd ${CURRENT_DIR}

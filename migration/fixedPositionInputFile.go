@@ -8,26 +8,60 @@ package migration
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 )
 
 //	attributes for a migration job
 type fixedPositionInputFile struct {
-	FileName string
-	Header   bool
-	Trailer  bool
-	Fields   []DataField
+	FileName  string
+	Header    bool
+	Trailer   bool
+	FieldList []DataField
 }
 
 //	create a new FixedPositionInputFile
 func NewFixedPositionInputFile(config JobInput) DataInputSource {
 
 	return &fixedPositionInputFile{
-		FileName: config.FileName,
-		Header:   config.Header,
-		Trailer:  config.Trailer,
+		FileName:  config.FileName,
+		Header:    config.Header,
+		Trailer:   config.Trailer,
+		FieldList: config.FieldList,
 	}
+}
+
+//	ValidateFormat validate file fields format
+func (f *fixedPositionInputFile) ValidateFormat() error {
+
+	for _, field := range f.FieldList {
+
+		//	validate the field type
+		_, found := data_field_type[field.Type]
+		if !found {
+			return errors.New("Invalid field type: " + field.Type)
+		}
+
+		//	validate start position
+		if field.StartPosition == 0 {
+			return errors.New("Required field start position: " + field.Name)
+		}
+
+		//	validate end position
+		if field.EndPosition == 0 {
+			return errors.New("Required field end position: " + field.Name)
+		}
+
+		//	validate start and end positions
+		if field.StartPosition > field.EndPosition {
+			return errors.New("Field start position greater than end position: " + field.Name)
+		}
+	}
+
+	//	check for overlaping fields
+
+	return nil
 }
 
 //	ImportData open fixed position file and import its data

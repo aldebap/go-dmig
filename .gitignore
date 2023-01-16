@@ -1,0 +1,5 @@
+#   vscode files
+.vscode/*
+
+#   build output dir
+bin/**
