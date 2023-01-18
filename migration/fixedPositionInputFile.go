@@ -35,6 +35,12 @@ func NewFixedPositionInputFile(config JobInput) DataInputSource {
 //	ValidateFormat validate file fields format
 func (f *fixedPositionInputFile) ValidateFormat() error {
 
+	//	there must be at least one field
+	if len(f.FieldList) == 0 {
+		return errors.New("File format need at least one field")
+	}
+
+	//	validate file fields format
 	for _, field := range f.FieldList {
 
 		//	validate the field type
@@ -60,6 +66,19 @@ func (f *fixedPositionInputFile) ValidateFormat() error {
 	}
 
 	//	check for overlaping fields
+	for i := 0; i < len(f.FieldList)-1; i++ {
+		for j := i + 1; j < len(f.FieldList); j++ {
+			if f.FieldList[i].StartPosition >= f.FieldList[j].StartPosition &&
+				f.FieldList[i].StartPosition <= f.FieldList[j].EndPosition {
+				return errors.New(fmt.Sprintf("Field #%d position overlapping with field #%d", i+1, j+1))
+			}
+
+			if f.FieldList[i].EndPosition >= f.FieldList[j].StartPosition &&
+				f.FieldList[i].EndPosition <= f.FieldList[j].EndPosition {
+				return errors.New(fmt.Sprintf("Field #%d position overlapping with field #%d", i+1, j+1))
+			}
+		}
+	}
 
 	return nil
 }
@@ -77,6 +96,9 @@ func (f *fixedPositionInputFile) ImportData() (rowsProcessed int64, err error) {
 
 	//	read config file line by line
 	var dataRow []byte
+	var valueList []string
+
+	valueList = make([]string, len(f.FieldList))
 
 	rowsProcessed = 0
 	dataFileReader := bufio.NewReader(dataFile)
@@ -91,7 +113,19 @@ func (f *fixedPositionInputFile) ImportData() (rowsProcessed int64, err error) {
 			continue
 		}
 
-		fmt.Fprintf(os.Stdout, "[trace] input rows: %s\n", string(dataRow))
+		//	extract fields from input line
+		for i, field := range f.FieldList {
+			valueList[i] = string(dataRow[field.StartPosition-1 : field.EndPosition])
+		}
+
+		fmt.Fprintf(os.Stdout, "[trace] fields: ")
+		for i, field := range f.FieldList {
+			if i > 0 {
+				fmt.Fprintf(os.Stdout, "; ")
+			}
+			fmt.Fprintf(os.Stdout, "%s = %s", field.Name, valueList[i])
+		}
+		fmt.Fprintf(os.Stdout, "\n")
 
 		rowsProcessed++
 	}
