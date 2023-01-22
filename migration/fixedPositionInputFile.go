@@ -89,8 +89,7 @@ func (f *fixedPositionInputFile) ImportData() (rowsProcessed int64, err error) {
 	//	 open fixed position file
 	dataFile, err := os.Open(f.FileName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[error] opening data file: %s\n", err.Error())
-		os.Exit(-1)
+		return 0, errors.New("fail opening data file: " + err.Error())
 	}
 	defer dataFile.Close()
 

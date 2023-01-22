@@ -8,6 +8,7 @@ package migration
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
@@ -83,6 +84,19 @@ func Test_ValidateFormat(t *testing.T) {
 				EndPosition:   12,
 			},
 		}}, output: "Field #2 position overlapping with field #3"},
+		{scenario: "valid field list", input: JobInput{FieldList: []DataField{
+			{
+				Name:          "test_1",
+				Type:          "string",
+				StartPosition: 1,
+				EndPosition:   3,
+			}, {
+				Name:          "test_2",
+				Type:          "string",
+				StartPosition: 4,
+				EndPosition:   9,
+			},
+		}}, output: ""},
 	}
 
 	t.Run(">>> validation of file fields format", func(t *testing.T) {
@@ -105,6 +119,110 @@ func Test_ValidateFormat(t *testing.T) {
 			if want != got {
 				t.Errorf("fail in ValidateFormat(): expected: %s result: %v", want, got)
 			}
+		}
+	})
+}
+
+//	Test_ImportData test cases for data file importing
+func Test_ImportData(t *testing.T) {
+
+	t.Run(">>> validation data file importing - invalid file name", func(t *testing.T) {
+
+		testDataSource := NewFixedPositionInputFile(JobInput{FileName: "xpto.txt"})
+
+		//	import data
+		got := ""
+		want := "fail opening data file: open xpto.txt: no such file or directory"
+
+		_, err := testDataSource.ImportData()
+		if err != nil {
+			got = err.Error()
+		}
+
+		if want != got {
+			t.Errorf("fail in ImportData(): expected: %s result: %v", want, got)
+		}
+	})
+
+	t.Run(">>> validation data file importing - empty file", func(t *testing.T) {
+
+		const testFileName = "testData.txt"
+
+		err := os.WriteFile(testFileName, []byte(""), 0644)
+		if err != nil {
+			t.Errorf("unexpected error creating test file: %s", err)
+		}
+		defer os.Remove(testFileName)
+
+		testDataSource := NewFixedPositionInputFile(JobInput{
+			FileName: testFileName,
+			FieldList: []DataField{
+				{
+					Name:          "test_1",
+					Type:          "string",
+					StartPosition: 1,
+					EndPosition:   3,
+				}, {
+					Name:          "test_2",
+					Type:          "string",
+					StartPosition: 4,
+					EndPosition:   9,
+				},
+			},
+		})
+
+		//	import data
+		got := int64(0)
+		want := int64(0)
+
+		got, err = testDataSource.ImportData()
+		if err != nil {
+			t.Errorf("unexpected error in ImportData(): %s", err)
+		}
+
+		if want != got {
+			t.Errorf("fail in ImportData(): expected: %d result: %d", want, got)
+		}
+	})
+
+	t.Run(">>> validation data file importing - valid file", func(t *testing.T) {
+
+		const testFileName = "testData.txt"
+
+		err := os.WriteFile(testFileName, []byte("001LINE#1\n002LINE#2\n"), 0644)
+		if err != nil {
+			t.Errorf("unexpected error creating test file: %s", err)
+		}
+		defer os.Remove(testFileName)
+
+		testDataSource := NewFixedPositionInputFile(JobInput{
+			FileName: testFileName,
+			FieldList: []DataField{
+				{
+					Name:          "test_1",
+					Type:          "string",
+					StartPosition: 1,
+					EndPosition:   3,
+				}, {
+					Name:          "test_2",
+					Type:          "string",
+					StartPosition: 4,
+					EndPosition:   9,
+				},
+			},
+		})
+
+		//	import data
+		got := int64(0)
+		want := int64(2)
+
+		got, err = testDataSource.ImportData()
+		if err != nil {
+			t.Errorf("unexpected error in ImportData(): %s", err)
+		}
+
+		if want != got {
+			t.Errorf("fail in ImportData(): expected: %d result: %d", want, got)
 		}
 	})
 }
