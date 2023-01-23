@@ -84,7 +84,7 @@ func (f *fixedPositionInputFile) ValidateFormat() error {
 }
 
 //	ImportData open fixed position file and import its data
-func (f *fixedPositionInputFile) ImportData() (rowsProcessed int64, err error) {
+func (f *fixedPositionInputFile) ImportData(nextStep DataPipelineStep) (rowsProcessed int64, err error) {
 
 	//	 open fixed position file
 	dataFile, err := os.Open(f.FileName)
@@ -95,9 +95,9 @@ func (f *fixedPositionInputFile) ImportData() (rowsProcessed int64, err error) {
 
 	//	read config file line by line
 	var dataRow []byte
-	var valueList []string
+	var rowValue map[string]string
 
-	valueList = make([]string, len(f.FieldList))
+	rowValue = make(map[string]string)
 
 	rowsProcessed = 0
 	dataFileReader := bufio.NewReader(dataFile)
@@ -113,18 +113,14 @@ func (f *fixedPositionInputFile) ImportData() (rowsProcessed int64, err error) {
 		}
 
 		//	extract fields from input line
-		for i, field := range f.FieldList {
-			valueList[i] = string(dataRow[field.StartPosition-1 : field.EndPosition])
+		for _, field := range f.FieldList {
+			rowValue[field.Name] = string(dataRow[field.StartPosition-1 : field.EndPosition])
 		}
 
-		fmt.Fprintf(os.Stdout, "[trace] fields: ")
-		for i, field := range f.FieldList {
-			if i > 0 {
-				fmt.Fprintf(os.Stdout, "; ")
-			}
-			fmt.Fprintf(os.Stdout, "%s = %s", field.Name, valueList[i])
+		//	if available, invoke the next step in the pipeline
+		if nextStep != nil {
+			nextStep.ProcessRow(rowValue)
 		}
-		fmt.Fprintf(os.Stdout, "\n")
 
 		rowsProcessed++
 	}

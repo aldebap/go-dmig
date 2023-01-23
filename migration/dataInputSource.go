@@ -8,5 +8,5 @@ package migration
 
 type DataInputSource interface {
 	ValidateFormat() error
-	ImportData() (rowsProcessed int64, err error)
+	ImportData(nextStep DataPipelineStep) (rowsProcessed int64, err error)
 }

@@ -134,7 +134,7 @@ func Test_ImportData(t *testing.T) {
 		got := ""
 		want := "fail opening data file: open xpto.txt: no such file or directory"
 
-		_, err := testDataSource.ImportData()
+		_, err := testDataSource.ImportData(nil)
 		if err != nil {
 			got = err.Error()
 		}
@@ -175,7 +175,7 @@ func Test_ImportData(t *testing.T) {
 		got := int64(0)
 		want := int64(0)
 
-		got, err = testDataSource.ImportData()
+		got, err = testDataSource.ImportData(nil)
 		if err != nil {
 			t.Errorf("unexpected error in ImportData(): %s", err)
 		}
@@ -216,7 +216,7 @@ func Test_ImportData(t *testing.T) {
 		got := int64(0)
 		want := int64(2)
 
-		got, err = testDataSource.ImportData()
+		got, err = testDataSource.ImportData(nil)
 		if err != nil {
 			t.Errorf("unexpected error in ImportData(): %s", err)
 		}

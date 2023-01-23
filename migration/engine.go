@@ -63,7 +63,13 @@ func (dmig *DataMigration) PerformMigration() error {
 			return err
 		}
 
-		rowsProcessed, err := input.ImportData()
+		var nextStep DataPipelineStep
+
+		if job.Trace {
+			nextStep = NewTraceDataStep(job.Trace)
+		}
+
+		rowsProcessed, err := input.ImportData(nextStep)
 		if err != nil {
 			return err
 		}
