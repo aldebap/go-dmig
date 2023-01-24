@@ -22,12 +22,13 @@ type DataField struct {
 
 //	attributes for a migration job
 type JobInput struct {
-	Description string      `yaml:"description"`
-	Type        string      `yaml:"type"`
-	FileName    string      `yaml:"file_name"`
-	Header      bool        `yaml:"header"`
-	Trailer     bool        `yaml:"trailer"`
-	FieldList   []DataField `yaml:"fields"`
+	Description    string      `yaml:"description"`
+	Type           string      `yaml:"type"`
+	FileName       string      `yaml:"file_name"`
+	FieldSeparator string      `yaml:"field_separator"`
+	Header         bool        `yaml:"header"`
+	Trailer        bool        `yaml:"trailer"`
+	FieldList      []DataField `yaml:"fields"`
 }
 
 //	attributes for a migration job

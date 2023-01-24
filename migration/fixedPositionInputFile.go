@@ -13,7 +13,7 @@ import (
 	"os"
 )
 
-//	attributes for a migration job
+//	attributes for a fixed lenght input file
 type fixedPositionInputFile struct {
 	FileName  string
 	Header    bool
@@ -21,7 +21,7 @@ type fixedPositionInputFile struct {
 	FieldList []DataField
 }
 
-//	create a new FixedPositionInputFile
+//	NewFixedPositionInputFile create a new FixedPositionInputFile
 func NewFixedPositionInputFile(config JobInput) DataInputSource {
 
 	return &fixedPositionInputFile{
