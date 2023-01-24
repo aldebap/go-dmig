@@ -16,7 +16,7 @@ import (
 //	attributes for a CSV Input file
 type csvInputFile struct {
 	FileName       string
-	FieldSeparator byte
+	FieldSeparator string
 	Header         bool
 	FieldList      []DataField
 }

@@ -15,11 +15,13 @@ import (
 //	constants for input/output types
 const (
 	FIXED_POSITION_FILE = 1
+	CSV_FILE            = 2
 )
 
 var (
 	io_type = map[string]uint8{
 		"FixedPositionFile": FIXED_POSITION_FILE,
+		"CSVFile":           CSV_FILE,
 	}
 )
 
@@ -56,6 +58,9 @@ func (dmig *DataMigration) PerformMigration() error {
 		switch inputType {
 		case FIXED_POSITION_FILE:
 			input = NewFixedPositionInputFile(job.Input)
+
+		case CSV_FILE:
+			input = NewCSVInputFile(job.Input)
 		}
 
 		err := input.ValidateFormat()
