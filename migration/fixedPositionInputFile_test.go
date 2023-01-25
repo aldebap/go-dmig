@@ -12,8 +12,8 @@ import (
 	"testing"
 )
 
-//	Test_ValidateFormat test cases for validation of file fields format
-func Test_ValidateFormat(t *testing.T) {
+//	Test_FixedPositionFile_ValidateFormat test cases for validation of file fields format
+func Test_FixedPositionFile_ValidateFormat(t *testing.T) {
 
 	//	a few test cases
 	var testScenarios = []struct {
@@ -99,7 +99,7 @@ func Test_ValidateFormat(t *testing.T) {
 		}}, output: ""},
 	}
 
-	t.Run(">>> validation of file fields format", func(t *testing.T) {
+	t.Run(">>> validation of fixed position file fields format", func(t *testing.T) {
 
 		for _, test := range testScenarios {
 
@@ -123,10 +123,10 @@ func Test_ValidateFormat(t *testing.T) {
 	})
 }
 
-//	Test_ImportData test cases for data file importing
-func Test_ImportData(t *testing.T) {
+//	Test_FixedPositionFile_ImportData test cases for data file importing
+func Test_FixedPositionFile_ImportData(t *testing.T) {
 
-	t.Run(">>> validation data file importing - invalid file name", func(t *testing.T) {
+	t.Run(">>> validation fixed position data file importing - invalid file name", func(t *testing.T) {
 
 		testDataSource := NewFixedPositionInputFile(JobInput{FileName: "xpto.txt"})
 
@@ -144,7 +144,7 @@ func Test_ImportData(t *testing.T) {
 		}
 	})
 
-	t.Run(">>> validation data file importing - empty file", func(t *testing.T) {
+	t.Run(">>> validation fixed position data file importing - empty file", func(t *testing.T) {
 
 		const testFileName = "testData.txt"
 
@@ -185,7 +185,7 @@ func Test_ImportData(t *testing.T) {
 		}
 	})
 
-	t.Run(">>> validation data file importing - valid file", func(t *testing.T) {
+	t.Run(">>> validation fixed position data file importing - valid file", func(t *testing.T) {
 
 		const testFileName = "testData.txt"
 

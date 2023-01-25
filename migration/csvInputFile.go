@@ -40,6 +40,11 @@ func (f *csvInputFile) ValidateFormat() error {
 		return errors.New("File format need at least one field or file have a header")
 	}
 
+	//	there must a field separator
+	if len(f.FieldSeparator) != 1 {
+		return errors.New("Missing or invalid field separator")
+	}
+
 	//	validate file fields format
 	for _, field := range f.FieldList {
 
