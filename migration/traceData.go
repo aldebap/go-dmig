@@ -11,8 +11,8 @@ import (
 	"os"
 )
 
-//	attributes for a migration job
-type traceDataPipelineStep struct {
+//	attributes for a trace
+type traceData struct {
 	Trace bool
 
 	NextStep DataPipelineStep
@@ -21,36 +21,38 @@ type traceDataPipelineStep struct {
 //	NewTraceDataStep create a new traceDataPipelineStep
 func NewTraceDataStep(trace bool) DataPipelineStep {
 
-	return &traceDataPipelineStep{
+	return &traceData{
 		Trace: trace,
 	}
 }
 
 //	SetNextStep set the next step in data pipeline
-func (s *traceDataPipelineStep) SetNextStep(nextStep DataPipelineStep) {
+func (s *traceData) SetNextStep(nextStep DataPipelineStep) {
 	s.NextStep = nextStep
 }
 
 //	GetNextStep get the next step in data pipeline
-func (s *traceDataPipelineStep) GetNextStep() DataPipelineStep {
+func (s *traceData) GetNextStep() DataPipelineStep {
 	return s.NextStep
 }
 
 //	ProcessRow generate a trace of the data row
-func (s *traceDataPipelineStep) ProcessRow(row map[string]string) (rowProcessed bool, err error) {
+func (s *traceData) ProcessRow(row map[string]string) (rowProcessed bool, err error) {
 
-	var i uint
+	if s.Trace {
+		var i uint
 
-	fmt.Fprintf(os.Stdout, "[trace] fields: ")
-	for fieldName, fieldValue := range row {
-		if i > 0 {
-			fmt.Fprintf(os.Stdout, "; ")
+		fmt.Fprintf(os.Stdout, "[trace] fields: ")
+		for fieldName, fieldValue := range row {
+			if i > 0 {
+				fmt.Fprintf(os.Stdout, "; ")
+			}
+			fmt.Fprintf(os.Stdout, "%s = '%s'", fieldName, fieldValue)
+
+			i++
 		}
-		fmt.Fprintf(os.Stdout, "%s = '%s'", fieldName, fieldValue)
-
-		i++
+		fmt.Fprintf(os.Stdout, "\n")
 	}
-	fmt.Fprintf(os.Stdout, "\n")
 
 	//	if available, invoke the next step in the pipeline
 	if s.NextStep != nil {
